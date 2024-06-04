@@ -5,9 +5,6 @@ const UserSchema = mongoose.Schema({
     email:{ type: String, required: false },
     password:{ type: String, required: false },
     links: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Link'}],
-
 });
 
-   
-
-export default mongoose.model("user",UserSchema );
+export default mongoose.model("users",UserSchema );
