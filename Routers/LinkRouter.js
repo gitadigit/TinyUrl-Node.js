@@ -8,6 +8,8 @@ LinkRouter.get("/:id", LinkController.getById);
 LinkRouter.post("/", LinkController.addLink);
 LinkRouter.put("/:id", LinkController.updateLink);
 LinkRouter.delete("/:id", LinkController.deleteLink);
-//LinkRouter.post('/:id/click',LinkController.addClick)
-LinkRouter.get('/redirect/:id', LinkController.redirectLink); 
+LinkRouter.get("/redirect/:id", LinkController.redirectLink); 
+LinkRouter.get("/:id/clicks", LinkController.getSegmentedClicks)
+
+
 export default LinkRouter;

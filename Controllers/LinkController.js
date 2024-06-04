@@ -1,36 +1,11 @@
 import Link from "../Models/Link.js";
 
 const LinkController = {
-
-  addClick: async (req, res) => {
-  const { id, ipAddress } = req.body; // שינוי לאיסוף נתונים מהגוף
-
-  try {
-    const link = await Link.findById(id);
-    if (!link) {
-      return res.status(404).json({ message: 'Link not found' });
-    }
-
-    const lastClick = link.clicks.find(click => click.ipAddress === ipAddress);
-
-    if (lastClick && (Date.now() - new Date(lastClick.insertedAt).getTime()) < 60000) {
-      return res.status(400).json({ message: 'Duplicate click detected' });
-    }
-
-    link.clicks.push({ ipAddress, insertedAt: new Date() });
-    await link.save();
-    res.json({ message: 'Click recorded' });
-  } catch (e) {
-    res.status(400).json({ message: e.message });
-  }
-},
-
-
-
+  
   getAll: async (req, res) => {
     try {
       const links = await Link.find();
-      res.json({ links});
+      res.json({ links });
     } catch (e) {
       res.status(400).json({ message: e.message });
     }
@@ -67,7 +42,7 @@ const LinkController = {
     }
   },
 
-  deleteLink : async (req, res) => {
+  deleteLink: async (req, res) => {
     const { id } = req.params;
     try {
       const deleted = await Link.findByIdAndDelete(id);
@@ -76,29 +51,50 @@ const LinkController = {
       res.status(400).json({ message: e.message });
     }
   },
-  
-  
-  //
+
   redirectLink: async (req, res) => {
+    const { id, ipAddress } = req.body;
+
+    try {
+      const link = await Link.findById(req.params.id);
+      if (!link) {
+        return res.status(404).json({ message: 'Link not found' });
+      }
+
+      const lastClick = link.clicks.find(click => click.ipAddress === ipAddress);
+
+      if (lastClick && (Date.now() - new Date(lastClick.insertedAt).getTime()) < 60000) {
+        return res.status(400).json({ message: 'Duplicate click detected' });
+      }
+
+      link.clicks.push({ ipAddress, insertedAt: new Date() });
+      await link.save();
+      res.json({ message: 'Click recorded - OK' });
+    } catch (e) {
+      res.status(400).json({ message: e.message });
+    }
+  },
+
+  getSegmentedClicks: async (req, res) => {
     try {
       const link = await Link.findById(req.params.id);
       if (!link) return res.status(404).send('Link not found');
 
-      const targetParamValue = req.query[link.targetParamName] || '';
-      const click = {
-        ipAddress: req.ip,
-        targetParamValue
-      };
-      link.clicks.push(click);
-      await link.save();
-      
-      res.redirect(link.originalUrl,301);
-      
+      const segmentedClicks = link.clicks.reduce((acc, click) => {
+        const targetValue = click.targetParamValue;
+        if (!acc[targetValue]) {
+          acc[targetValue] = 0;
+        }
+        acc[targetValue]++;
+        return acc;
+      }, {});
+
+      res.json(segmentedClicks);
     } catch (error) {
       res.status(500).send(error.message);
     }
   },
-  
+
 };
 
 export default LinkController;

@@ -22,4 +22,5 @@ mongoose.set("toJSON", {
     },
   });
 
+
 export default connectDB;
