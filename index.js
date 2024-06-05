@@ -12,9 +12,9 @@ app.use(cors());
 const port = 3001
 app.use(bodyParser.json());
 
-// app.get('/', (req, res) => {
-//   res.send('Hello World!')
-// })
+app.get('/', (req, res) => {
+  res.send('click user / link')
+})
 
 app.use('/user', UsersRouter);
 app.use('/link', LinkRouter);
